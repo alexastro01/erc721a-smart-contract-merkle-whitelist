@@ -7,23 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
-/**
-█████████████████████████████████████████████████████████
-█▄─▄▄─█▄─▄▄─█▄─▄▄▀█▄─▄▄─█▄─▄█▄─▄▄▀█▄─▄█─▄▄─█▄─██─▄█─▄▄▄▄█
-██─▄▄▄██─▄█▀██─▄─▄██─▄████─███─██─██─██─██─██─██─██▄▄▄▄─█
-▀▄▄▄▀▀▀▄▄▄▄▄▀▄▄▀▄▄▀▄▄▄▀▀▀▄▄▄▀▄▄▄▄▀▀▄▄▄▀▄▄▄▄▀▀▄▄▄▄▀▀▄▄▄▄▄▀                        
 
-
-
-Thanks to numerous resources around the NFT community we have created a contract
-that tries to keep the gas fees low.
-
-We implemented ERC721A to save on Gas during the initial mint. (https://erc721a.org)
-Allow List - We used the Merkle Tree method to provide proof of allow list.
-
-Made my @computercrypto, @ariaworkshop.
-Thank you @DuroNFT for the amazing resources.
-**/
 
 /// Contract ///
 contract MyNFT is ERC721A, Ownable, ReentrancyGuard {  
@@ -45,7 +29,7 @@ contract MyNFT is ERC721A, Ownable, ReentrancyGuard {
     bool public presaleActive;
 
     string public _baseTokenURI;
-    string public homiesProvenance;
+    string public NFTProvenance;
 
     mapping (address => uint256) public _tokensMintedByAddress;
     mapping (address => uint256) public publicsaleAddressMinted;
@@ -55,11 +39,11 @@ contract MyNFT is ERC721A, Ownable, ReentrancyGuard {
     // Founders and Project Addresses //
     address a1 = 0xEa64073446E6AFd80574D8a72c8E9af547a43018;
     address a2 = 0xEa64073446E6AFd80574D8a72c8E9af547a43018;
-    address a3 = 0xEa64073446E6AFd80574D8a72c8E9af547a43018;
+  
 
     // Constructor //
     constructor( )
-        ERC721A("MyNFT", "HH") {                  
+        ERC721A("MyNFT", "MNFT") {                  
       
     }
 
@@ -146,7 +130,7 @@ contract MyNFT is ERC721A, Ownable, ReentrancyGuard {
 
 
     function setProvenanceHash(string memory provenanceHash) external onlyOwner {
-        homiesProvenance = provenanceHash;
+        NFTProvenance = provenanceHash;
     }
 
     // Withdraw funds from contract for the founders and Project Wallet.
@@ -154,10 +138,10 @@ contract MyNFT is ERC721A, Ownable, ReentrancyGuard {
     function withdrawAll() public payable onlyOwner {
         uint256 _balance = address(this).balance;
         uint256 percent = _balance / 100;
-        // 54% Split among the founders
-        require(payable(a1).send(percent * 36));
-        require(payable(a2).send(percent * 18));
-        // 46% to the Project Wallet
-        require(payable(a3).send(percent * 46));
+        // 50/50 Split among the team
+        require(payable(a1).send(percent * 50));
+        require(payable(a2).send(percent * 50));
+        
+       
     }
 }
