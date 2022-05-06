@@ -23,6 +23,8 @@ contract MyNFT is ERC721A, Ownable, ReentrancyGuard {
     //MaxPerWallet 
     uint256 public maxMint = 2; 
     uint256 public maxPresaleMint = 2; 
+        address public proxyRegistryAddress;
+
 
 
     bool public saleActive;
@@ -33,6 +35,7 @@ contract MyNFT is ERC721A, Ownable, ReentrancyGuard {
 
     mapping (address => uint256) public _tokensMintedByAddress;
     mapping (address => uint256) public publicsaleAddressMinted;
+     mapping(address => bool) public projectProxy;
     bytes32 public presaleMerkleRoot;
     
 
@@ -42,8 +45,9 @@ contract MyNFT is ERC721A, Ownable, ReentrancyGuard {
   
 
     // Constructor //
-    constructor( )
-        ERC721A("MyNFT", "MNFT") {                  
+    constructor(address _proxyRegistryAddress )
+        ERC721A("MyNFT", "MNFT") {    
+                           proxyRegistryAddress = _proxyRegistryAddress;
       
     }
 
@@ -144,4 +148,30 @@ contract MyNFT is ERC721A, Ownable, ReentrancyGuard {
         
        
     }
+
+        // Proxy Functions
+    function setProxyRegistryAddress(address _proxyRegistryAddress)  external view onlyOwner {
+        _proxyRegistryAddress = _proxyRegistryAddress;
+    }
+
+    function flipProxyState(address _proxyAddress) public onlyOwner {
+        projectProxy[_proxyAddress] = !projectProxy[_proxyAddress];
+    }
+
+    // OpenSea Secondary Contract Approval - Removes initial approval gas fee from sellers
+    // Allow future contract approval
+    function isApprovedForAll(address _owner, address _operator) public view override returns (bool) {
+        OpenSeaProxyRegistry proxyRegistry = OpenSeaProxyRegistry(proxyRegistryAddress);
+        if (address(proxyRegistry.proxies(_owner)) == _operator || projectProxy[_operator]) return true;
+        return super.isApprovedForAll(_owner, _operator);
+    }
+
+
+}
+ 
+
+
+contract OwnableDelegateProxy { }
+contract OpenSeaProxyRegistry {
+    mapping(address => OwnableDelegateProxy) public proxies;
 }
